@@ -1,0 +1,44 @@
+%
+% function W = Weight_M_update (ipts, par)
+%
+%
+
+function [W error] = Weight_M_update (ipts, par)
+%
+%  the function aims to compute the weight dialog matrix
+%
+%  input
+%       ipts          the structure data of input
+%           .y        the original signal vector
+%           .D        the dictionary matrix, each vector is an sample
+%           .x        the sparse coding coef
+%
+%       par           the structure parameter of input
+%          .mode      the update model
+%                     1£º 'step'  step function with two value
+%          .m1_thre   the threhold in mode 1
+%          .m1_er_a   the linear weight para of comptuing error
+
+W         =    [];
+y         =    ipts.y;
+D         =    ipts.D;
+x         =    ipts.x;
+mode      =    par.mode;
+m1_thre   =   par.m1_thre;
+m1_er_a   =   par.m1_er_a;
+
+if mode == 1 % step function
+    
+    y_true = (1-m1_er_a)*y.^2+m1_er_a*(D*x).^2;
+    error = (y-D*x).^2./y_true; % should according the illumination model
+    % the error should be (y-Dx).^2/Y.^2, Y is the true image.
+    
+
+    diag_W                     = error;
+    diag_W(error>m1_thre)      = 0.1;
+    diag_W(error<=m1_thre)     =  1;   
+    sum_w                      = sum(diag_W);
+    diag_W                     = diag_W./sum_w*length(diag_W);
+    W                          = diag(diag_W);
+    
+end
