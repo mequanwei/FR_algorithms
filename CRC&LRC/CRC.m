@@ -1,6 +1,11 @@
 function [ acc,label ] = CRC( tra,tes,lambda)
-%CRC 此处显示有关此函数的摘要
-%   此处显示详细说明
+% input 
+%		tra: N x (D+1), train data
+%		tes: num x (D+1), test data
+%		lambda: coefficient of regularization term 
+% output
+%		acc: accuracy
+%		label: labels for test data of input    
 tr_l = tra(:,end);
 te_l = tes(:,end);
 tr = tra(:,1:end-1);
@@ -27,7 +32,7 @@ for i = 1:num
     end
     [~,No] = min(dis);
     label(i) = clas(No);
-    disp(num2str(i/num));
+    %disp(num2str(i/num));
 end
     acc = sum(label == te_l)/num;
  
