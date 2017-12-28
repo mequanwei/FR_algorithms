@@ -1,12 +1,12 @@
 function [ rate ] = L21_R( train_data,test_data,row,col)
-% L21 ×ö±£ÕæÏî£¬ÐÐµÄÐÎÊ½£¬L2ÕýÔò
+% L21 åšä¿çœŸé¡¹ï¼Œè¡Œçš„å½¢å¼ï¼ŒL2æ­£åˆ™
 %
 
 [~,n] = size(train_data);
-class = unique(train_data(:,n));%Àà
-clas_tra = train_data(:,n);     %ÑµÁ·Àà±êÇ©
-clas_tes = test_data(:,n);      %²âÊÔÀà±êÇ©
-A_cell = cell(1,size(class,1)); %A_cell{i} Ö¸subjectiËùÓÐÑµÁ·Êý¾Ý
+class = unique(train_data(:,n));%ç±»
+clas_tra = train_data(:,n);     %è®­ç»ƒç±»æ ‡ç­¾
+clas_tes = test_data(:,n);      %æµ‹è¯•ç±»æ ‡ç­¾
+A_cell = cell(1,size(class,1)); %A_cell{i} æŒ‡subjectiæ‰€æœ‰è®­ç»ƒæ•°æ®
 
 for k = 1:size(class,1)
     ind2 = (clas_tra == class(k));
@@ -21,14 +21,14 @@ right = 0;
 
 for i = 1:size(class,1)
     ind = (clas_tes==class(i));
-    tesi = test_data(ind,:);                    %µÚiÀàµÄY
+    tesi = test_data(ind,:);                    %ç¬¬iç±»çš„Y
     class(i)
     for j = 1:size(tesi,1)
-        Y = reshape(tesi(j,1:n - 1),row,col);   %µÚiÀàµÄµÚj¸öY
+        Y = reshape(tesi(j,1:n - 1),row,col);   %ç¬¬iç±»çš„ç¬¬jä¸ªY
         DIS = zeros(size(class,1),1); 
         for k = 1:size(class,1)
             A = A_cell{k};                                          
-            [X,Wl] = train(A,Y,row);            %µü´ú           
+            [X,Wl] = train(A,Y,row);            %è¿­ä»£           
             DIS(k) = Get_dis_row(X,A,Y);
         end
         [~,no] = min(DIS);
@@ -54,4 +54,43 @@ while norm(T-X)>0.0001||i<11
     [Wl] = Get_w_row(A,Y,X');
 end
 end
+
+function [ X ] = Get_x_row( A,Y,W)
+%get_x_row
+%   æ­¤å¤„æ˜¾ç¤ºè¯¦ç»†è¯´æ˜Ž
+[m,n,pi] = size(A);
+inv_sum_l = zeros(pi);
+D_l = zeros(pi,n);
+sum_l = zeros(pi,1);
+for l = 1:m
+    D = A(l,:,:); %D_l ï¼špi*m
+    for i = 1:pi  % m*nçš„å›¾åƒ
+        D_l(i,:) = D(:,:,i); 
+    end
+    inv_sum_l = inv_sum_l + W(l)*(D_l*D_l'); 
+    sum_l = sum_l + W(l)*D_l * Y(l,:)';
+end
+
+function [ W ] = Get_w_row( A,Y,X )
+%GET_WI æ­¤å¤„æ˜¾ç¤ºæœ‰å…³æ­¤å‡½æ•°çš„æ‘˜è¦
+%   æ­¤å¤„æ˜¾ç¤ºè¯¦ç»†è¯´æ˜Ž
+
+sigma = 0.001;
+[m,n,pi] = size(A);
+W = zeros(m,1);
+D_l = zeros(pi,n);
+for l = 1:m
+    D = A(l,:,:); 
+    for i = 1:pi  %m*nçš„å›¾åƒ
+        D_l(i,:) = D(:,:,i);  %å–D_lçš„å€¼ï¼Œè¡Œç‰¹å¾ pi*nç»´
+    end
+    W(l) = ((Y(l,:)-X*D_l)*(Y(l,:)-X*D_l)' + sigma)^(-1/2);
+end
+
+end
+
+X = pinv(inv_sum_l)*sum_l;
+
+end
+
 
