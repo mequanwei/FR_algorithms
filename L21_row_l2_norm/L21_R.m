@@ -70,6 +70,10 @@ for l = 1:m
     inv_sum_l = inv_sum_l + W(l)*(D_l*D_l'); 
     sum_l = sum_l + W(l)*D_l * Y(l,:)';
 end
+X = pinv(inv_sum_l)*sum_l;
+
+end
+
 
 function [ W ] = Get_w_row( A,Y,X )
 %GET_WI 此处显示有关此函数的摘要
@@ -89,8 +93,6 @@ end
 
 end
 
-X = pinv(inv_sum_l)*sum_l;
 
-end
 
 
