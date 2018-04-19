@@ -56,9 +56,6 @@ end
 end 
 
 
-plot(dis);
-figure;
-bar(x);
 
 end
 
